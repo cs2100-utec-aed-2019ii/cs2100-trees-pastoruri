@@ -1,34 +1,23 @@
 #ifndef TREES_TREE_H
 #define TREES_TREE_H
 #include <iostream>
+#include <vector>
 using namespace std;
-
-
 template <typename T>
 class Node {
 public:
     T key;
     Node<T> *left;
     Node<T> *right;
-
-    Node(T key) {
-        this->key = key;
-        this->left = this->right = nullptr;
-    }
-
-    ~Node() {
-
-    }
+    Node(T key) { this->key = key; this->left = this->right = nullptr; }
+    ~Node() {}
 };
 
 template <typename T>class Tree{
-
 public:
-
     Node<T> * root;
-
+    int height=0;
     Tree(){root=nullptr;}
-
     Tree(T rootKey){root = new Node<T>(rootKey);}
 
     ///Metodos
@@ -61,57 +50,99 @@ public:
 
     }
 
+Node<T>* deleteNode(Node<T>* root, int value) {
 
+        if (root == nullptr)
+            return root;
 
-   Node<T>* deleteNode(Node<T>* rootaux, int key){
+        if (value < root->key) {
+            root->left = deleteNode(root->left, value);
+        } else if (value > root->key) {
+            root->right = deleteNode(root->right, value);
+        } else {
 
-        if (rootaux == nullptr) cout<<endl<<"Tree not initialized"<<endl;
+            if (root->left == nullptr) {
+                return root->right;
+            } else if (root->right == nullptr)
+                return root->left;
 
-        if (key < rootaux->key)
-            rootaux->left = deleteNode(rootaux->left, key);
-        else if (key > rootaux->key)
-            rootaux->right = deleteNode(rootaux->right, key);
-        else{
-            if (rootaux->left == NULL){
-                Node<T> *temp = rootaux->right;
-                free(rootaux);
-            }
-            else if (rootaux->right == NULL){
-                Node<T> *temp = rootaux->left;
-                free(rootaux);
-            }
-            ///TODO : IMPLEMENT MIN
-            Node<T>* temp = min(rootaux->right);
-            rootaux->key = temp->key;
-            rootaux->right = deleteNode(rootaux->right, temp->key);
+            root->key = inOrderSuccessor(root->right);
+            root->right = deleteNode(root->right, root->key);
         }
+
+        return root;
+
     }
+
+T inOrderSuccessor(Node<T>* root) {
+
+        T minimum = root->key;
+        while (root->left != nullptr) {
+            minimum = root->left->key;
+            root = root->left;
+        }
+        return minimum;
+    }
+
+
+
+
     Node<T>* getroot(){return root;}
 
-    void inOrderPrint(Node<T>* node ){
+    void inOrderImprimir(Node<T>* node ){
         if (node == nullptr) return;
-        inOrderPrint(node->left);
+        inOrderImprimir(node->left);
         cout << node->key << " ";
-        inOrderPrint(node->right);
-
-
+        inOrderImprimir(node->right);
     }
 
-    void printPreorder(Node<T>* node)
-    {
+    void postOrderImprimir(Node<T>* node){
         if (node == nullptr) return;
-        cout << node->key << " ";
-        printPreorder(node->left);
-        printPreorder(node->right);
-    }
-    void printPostorder(Node<T>* node)
-    {
-        if (node == nullptr) return;
-        printPostorder(node->left);
-        printPostorder(node->right);
+        postOrderImprimir(node->left);
+        postOrderImprimir(node->right);
         cout << node->key << " ";
     }
 
+    void preOrderImprimir(Node<T>* node){
+        if (node == nullptr) return;
+        cout << node->key << " ";
+        preOrderImprimir(node->left);
+        preOrderImprimir(node->right);
+    }
+
+
+    void ContarHeightConInOrder(Node<T>* node ){
+        if (node == nullptr) return;
+        ContarHeightConInOrder(node->left);
+        ContarHeightConInOrder(node->right);
+        height++;
+    }
+
+
+
+    int SonIdenticosAux(Node<T>* rootFromTree1, Node<T>* rootFromTree2){
+
+        if (rootFromTree1 == nullptr && rootFromTree2 == nullptr)
+            return 1;
+        if (rootFromTree1 != nullptr && rootFromTree2 != nullptr){
+            return (rootFromTree1->key == rootFromTree2->key &&
+                    SonIdenticosAux(rootFromTree1->left, rootFromTree2->left) &&
+                    SonIdenticosAux(rootFromTree1->right, rootFromTree2->right));
+        }
+        return 0;
+    }
+
+    bool SonIdenticos(Node<T>* rootDelOtroArbol){
+      return SonIdenticosAux(root, rootDelOtroArbol);
+    }
+
+    int Altura(){
+        ContarHeightConInOrder(root);
+        height = height/2+1;
+        return height;
+    }
+
+    
 
 };
 
