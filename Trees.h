@@ -27,121 +27,92 @@ public:
 
     Node<T> * root;
 
-    ///Constructores
+    Tree(){root=nullptr;}
 
-    Tree():root(nullptr){}
-
-    Tree(T rootKey):root(rootKey){}
+    Tree(T rootKey){root = new Node<T>(rootKey);}
 
     ///Metodos
+    bool isEmpty(){return root==nullptr;}
 
-    void insert_node(T insertNodeKey){
-
-        if(root->key == nullptr){
-            root->key == insertNodeKey;
+    void insert(T data) {
+        Node<T>* nodo = new Node<T>(data);
+        if (root == nullptr) {
+            root = nodo;
         }
-        else{
-            auto temp=root;
-            Node<T>* aux(insertNodeKey);
-
-            if(insertNodeKey > root->key){
-                    Site1:
-                    while(temp->key < insertNodeKey){
+        else if (root != nullptr) {
+            for (Node<T>* temp = this->root; temp != nullptr;) {
+                if (temp->key > nodo->key) {
+                    if (temp->left == nullptr) {
+                        temp->left = nodo;
+                        break;
+                    } else {
+                        temp = temp->left;
+                    }
+                } else if (temp->key < nodo->key) {
+                    if (temp->right == nullptr) {
+                        temp->right = nodo;
+                        break;
+                    } else {
                         temp = temp->right;
                     }
-                    if(temp->left == nullptr){
-                        temp->left == aux;
-                    }
-                    else{
-                        temp = temp->left;
-                        goto Site1;
-                    }
-            }
-
-            else if(insertNodeKey < root->key){
-                Site2:
-                while(temp->key > insertNodeKey){
-                    temp = temp->left;
-                }
-                if(temp->right == nullptr){
-                    temp->right == aux;
-                }
-                else{
-                    temp = temp->right;
-                    goto Site2;
                 }
             }
         }
+
     }
 
 
-    void delete_node(T deleteNodeKey){
-        if(root->key == nullptr){
-            cout<<endl<<"Tree is empty, no node is to be deleted"<<endl;
-        }
+
+   Node<T>* deleteNode(Node<T>* rootaux, int key){
+
+        if (rootaux == nullptr) cout<<endl<<"Tree not initialized"<<endl;
+
+        if (key < rootaux->key)
+            rootaux->left = deleteNode(rootaux->left, key);
+        else if (key > rootaux->key)
+            rootaux->right = deleteNode(rootaux->right, key);
         else{
-            auto temp=root;
-            auto newroot=root;
-            Site1:
-            if(deleteNodeKey > newroot->key){
-
-                while(temp->key <= deleteNodeKey){
-                    auto aux = temp;
-                    temp = temp->right;
-                }
-
-                if(temp == deleteNodeKey){
-                    auto aux = temp->left;
-                    temp->left = nullptr;
-                }
-                else{
-                    if(temp->left == nullptr) {cout<<endl<<"Given node does not exist"<<endl;}
-                    temp = temp->left;
-                    newroot=temp;
-                    goto Site1;
-                }
-
+            if (rootaux->left == NULL){
+                Node<T> *temp = rootaux->right;
+                free(rootaux);
             }
-
-            else if(deleteNodeKey < newroot->key){
-
-                while(temp->key >= deleteNodeKey){
-                    auto aux = temp;
-                    temp = temp->left;
-                }
-
-                if(temp == deleteNodeKey){
-                    auto aux = temp->right;
-                    temp->right = nullptr;
-                }
-                else if(temp->right->key == deleteNodeKey){
-                        auto aux1= temp;
-                        if(temp->right->left == nullptr){
-                            temp->right = temp->right->right;
-                        }
-                        else{
-                            while(aux1->right->right != nullptr){
-                                aux1 = aux1->right;
-                            }
-                            temp = aux1->right;
-                            aux1 ->right == nullptr;
-
-                        }
-
-                }
-                else{
-                    if(temp->right == nullptr) {cout<<endl<<"Given node does not exist"<<endl;}
-                    newroot=temp;
-                    goto Site1;
-                }
-
+            else if (rootaux->right == NULL){
+                Node<T> *temp = rootaux->left;
+                free(rootaux);
             }
-
+            ///TODO : IMPLEMENT MIN
+            Node<T>* temp = min(rootaux->right);
+            rootaux->key = temp->key;
+            rootaux->right = deleteNode(rootaux->right, temp->key);
         }
+    }
+    Node<T>* getroot(){return root;}
 
+    void inOrderPrint(Node<T>* node ){
+        if (node == nullptr) return;
+        inOrderPrint(node->left);
+        cout << node->key << " ";
+        inOrderPrint(node->right);
 
 
     }
+
+    void printPreorder(Node<T>* node)
+    {
+        if (node == nullptr) return;
+        cout << node->key << " ";
+        printPreorder(node->left);
+        printPreorder(node->right);
+    }
+    void printPostorder(Node<T>* node)
+    {
+        if (node == nullptr) return;
+        printPostorder(node->left);
+        printPostorder(node->right);
+        cout << node->key << " ";
+    }
+
+
 };
 
 
